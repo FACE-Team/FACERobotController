@@ -1,0 +1,4 @@
+E:\GitHub\bin\Debug\FACERobotController.exe.config
+E:\GitHub\bin\Debug\FACERobotControl.exe.config
+E:\GitHub\FACERobotControl\FACERobotController\obj\Debug\FACERobotControl.exe
+E:\GitHub\FACERobotControl\FACERobotController\obj\Debug\FACERobotControl.pdb
