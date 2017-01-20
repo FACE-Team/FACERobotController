@@ -1,7 +1,7 @@
-﻿<Window x:Class="FACERobotControl.MainWindow"
+﻿<Window x:Class="FACERobotController.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="FACERobotControl" Height="363" Width="622"  Closing="Window_Closing" ResizeMode="NoResize">
+        Title="FACERobotController" Height="363" Width="622"  Closing="Window_Closing" ResizeMode="NoResize">
     <Grid Margin="0,0,0,0">
 
         <Image HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="144" Source="Images/logocp.png"/>

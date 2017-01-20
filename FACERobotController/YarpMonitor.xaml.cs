@@ -8,7 +8,7 @@ using System.Xml.Linq;
 using YarpManagerCS;
 using System.Diagnostics;
 
-namespace FACERobotControl
+namespace FACERobotController
 {
     /// <summary>
     /// Interaction logic for YarpMonitor.xaml

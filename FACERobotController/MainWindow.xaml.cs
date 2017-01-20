@@ -87,10 +87,16 @@ namespace FACERobotController
         string receivedFeedback = "";
 
 
-        private System.Timers.Timer yarpLookAtTimer, yarpReceverECSTimer, yarpReceverFacialExpressionTimer, yarpReceverReflexesTimer, yarpReceverFeedbackTimer;
         private System.Timers.Timer TimerCheckStatusYarp;
 
         private System.Threading.Thread senderThreadFeedBack = null;
+        private System.Threading.Thread receiverThreadFeedBack = null;
+        private System.Threading.Thread receiverThreadLookAt = null;
+        private System.Threading.Thread receiveThreadECS = null;
+        private System.Threading.Thread receiveThreadFacialExpression = null;
+
+        
+
 
         private List<ServoMotor> currentSmState;
         private ECS ecs;
@@ -114,8 +120,7 @@ namespace FACERobotController
 
         public MainWindow()
         {
-            var dllDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "/lib";
-            Environment.SetEnvironmentVariable("PATH", Environment.GetEnvironmentVariable("PATH") + ";" + dllDirectory);
+            
 
             InitializeComponent();
 
@@ -140,7 +145,7 @@ namespace FACERobotController
             listMotorsFacialExpression = new List<ServoMotor>();
             motionLookAt = new FACEMotion(FACEBody.CurrentMotorState.Count);
             motionECS = new FACEMotion(FACEBody.CurrentMotorState.Count);
-             ListFeedbackOnlyPositions = new List<float>();
+            ListFeedbackOnlyPositions = new List<float>();
         }
         /// <summary>
         /// Initialize Timer for Test Yarp
@@ -197,9 +202,6 @@ namespace FACERobotController
             lblMot.Content = setFacialMotors_out;
 
 
-
-
-
             TimerCheckStatusYarp = new System.Timers.Timer();
             TimerCheckStatusYarp.Elapsed += new ElapsedEventHandler(CheckStatusYarp);
             TimerCheckStatusYarp.Interval = (1000) * (5);
@@ -208,38 +210,27 @@ namespace FACERobotController
 
             CheckStatusYarp(null , null);
 
-            //A 40ms funzionava abbastanza bene
-            yarpLookAtTimer = new System.Timers.Timer();
-            yarpLookAtTimer.Interval = 40;
-            //yarpLookAtTimer.Elapsed += new ElapsedEventHandler(ReceiverDataLookAt);
-            //yarpLookAtTimer.Start();
-
-            yarpReceverECSTimer = new System.Timers.Timer();
-            yarpReceverECSTimer.Interval = 200;
-            //yarpReceverECSTimer.Elapsed += new ElapsedEventHandler(ReceiveDataECS);
-            //yarpReceverECSTimer.Start();
-
-            yarpReceverFacialExpressionTimer = new System.Timers.Timer();
-            yarpReceverFacialExpressionTimer.Interval = 200;
-            yarpReceverFacialExpressionTimer.Elapsed += new ElapsedEventHandler(ReceiveDataFacialExpression);
-            //yarpReceverFacialExpressionTimer.Start();
-
-            yarpReceverFeedbackTimer = new System.Timers.Timer();
-            yarpReceverFeedbackTimer.Interval = 200;
-            //yarpReceverFeedbackTimer.Elapsed += new ElapsedEventHandler(ReceiveDataFeedback);
-            //yarpReceverFeedbackTimer.Start();
-
-            yarpReceverReflexesTimer = new System.Timers.Timer();
-            yarpReceverReflexesTimer.Interval = 200;
-            yarpReceverReflexesTimer.Elapsed += new ElapsedEventHandler(ReceiveDataReflexes);
-           // yarpReceverReflexesTimer.Start();
 
             senderThreadFeedBack = new System.Threading.Thread(SendFeedBack);
             //senderThreadFeedBack.Start();
 
-            ThreadPool.QueueUserWorkItem(ReceiveDataFeedback);
-            ThreadPool.QueueUserWorkItem(ReceiverDataLookAt);
-            ThreadPool.QueueUserWorkItem(ReceiveDataECS);
+            receiverThreadFeedBack = new System.Threading.Thread(ReceiveDataFeedback);
+            receiverThreadFeedBack.Start();
+
+            receiverThreadLookAt = new System.Threading.Thread(ReceiverDataLookAt);
+            receiverThreadLookAt.Start();
+
+            receiveThreadECS = new System.Threading.Thread(ReceiveDataECS);
+            receiveThreadECS.Start();
+
+            receiveThreadFacialExpression = new System.Threading.Thread(ReceiveDataFacialExpression);
+            receiveThreadFacialExpression.Start();
+
+
+           //ThreadPool.QueueUserWorkItem(ReceiveDataFeedback);
+           // ThreadPool.QueueUserWorkItem(ReceiverDataLookAt);
+           // ThreadPool.QueueUserWorkItem(ReceiveDataECS);
+           // ThreadPool.QueueUserWorkItem(ReceiveDataFacialExpression);
 
 
 
@@ -299,54 +290,72 @@ namespace FACERobotController
             }
         }
 
-        void ReceiveDataFacialExpression(object sender, ElapsedEventArgs e)
+        void ReceiveDataFacialExpression(object sender)
         {
-            yarpPortSetFacialExpression.receivedData(out receivedFacialExpression);
-            if (receivedFacialExpression != null && receivedFacialExpression != "")//&& yarpExpressionOn)
+            while (true)
             {
-                try
+                yarpPortSetFacialExpression.receivedData(out receivedFacialExpression);
+                if (receivedFacialExpression != null && receivedFacialExpression != "")//&& yarpExpressionOn)
                 {
-
-                    //Json
-                    //listMotors = ComUtils.JsonNetSerializer.Deserialize<List<ServoMotor>>(receivedSetMotors);
-
-                    listMotorsFacialExpression = ComUtils.XmlUtils.Deserialize<List<ServoMotor>>(receivedFacialExpression);
-
-                    foreach (ServoMotor serv in listMotorsFacialExpression)
+                    try
                     {
-                        if (!((serv.PulseWidthNormalized >= 0 && serv.PulseWidthNormalized <= 1) || serv.PulseWidthNormalized == -1.0))
+
+                        //Json
+                        //listMotors = ComUtils.JsonNetSerializer.Deserialize<List<ServoMotor>>(receivedSetMotors);
+
+                        //foreach (ServoMotor serv in listMotorsFacialExpression)
+                        //{
+                        //    if (!((serv.PulseWidthNormalized >= 0 && serv.PulseWidthNormalized <= 1) || serv.PulseWidthNormalized == -1.0))
+                        //    {
+
+                        //        MessageBox.Show("Error PulseWidthNormalized of ServoMotor " + serv.Name +" PulseWidthNormalized:"+serv.PulseWidthNormalized);
+                        //        return;
+                        //    }
+                        //    else if(serv.Name=="Jaw" && (serv.PulseWidthNormalized<=0.25|| serv.PulseWidthNormalized>=0.75))
+                        //    {
+                        //        MessageBox.Show("Error PulseWidthNormalized of ServoMotor " + serv.Name +" PulseWidthNormalized:"+serv.PulseWidthNormalized);
+                        //        return;
+                        //    } 
+                        //}
+
+                        if (listMotorsFacialExpression.FindAll(a => (a.PulseWidthNormalized >= 0 && a.PulseWidthNormalized <= 1) || a.PulseWidthNormalized == -1.0).Count != 32)
                         {
-                            MessageBox.Show("Error PulseWidthNormalized of ServoMotor " + serv.Name +" PulseWidthNormalized:"+serv.PulseWidthNormalized);
+                            MessageBox.Show("Error PulseWidthNormalized ");//of ServoMotor " + serv.Name + " PulseWidthNormalized:" + serv.PulseWidthNormalized);
                             return;
                         }
+                        else if (listMotorsFacialExpression.FindAll(a => (a.PulseWidthNormalized <= 0.25 || a.PulseWidthNormalized >= 0.75) || a.Name == "Jaw").Count == 1)
+                        {
+                            MessageBox.Show("Error PulseWidthNormalized of ServoMotor Jaw ");// + serv.Name + " PulseWidthNormalized:" + serv.PulseWidthNormalized);
+                            return;
+                        }
+
+                        //Bottle
+                        //listMotors.AddRange(currentSmState);
+                        //string[] res= receivedSetMotors.Split(' ');
+
+                        //for (int i = 0; i <= res.Length; i++)
+                        //{
+                        //    if ((float.Parse(res[i]) >= 0 && float.Parse(res[i]) <= 1) || float.Parse(res[i]) == -1.0)
+                        //        listMotors[i].PulseWidthNormalized = float.Parse(res[i]);
+                        //    else
+                        //    {
+                        //        return;
+                        //    }
+                        //}
+
+                        yarpPortSetFacialMotors.sendData(ComUtils.XmlUtils.Serialize<List<ServoMotor>>(listMotorsFacialExpression));
+
+                        receivedFacialExpression = null;
+
+                        listMotorsFacialExpression.Clear();
+
+                    }
+                    catch (Exception exc)
+                    {
+                        Console.WriteLine("Error XML Set motors: " + exc.Message);
                     }
 
-                    //Bottle
-                    //listMotors.AddRange(currentSmState);
-                    //string[] res= receivedSetMotors.Split(' ');
-
-                    //for (int i = 0; i <= res.Length; i++)
-                    //{
-                    //    if ((float.Parse(res[i]) >= 0 && float.Parse(res[i]) <= 1) || float.Parse(res[i]) == -1.0)
-                    //        listMotors[i].PulseWidthNormalized = float.Parse(res[i]);
-                    //    else
-                    //    {
-                    //        return;
-                    //    }
-                    //}
-
-                    yarpPortSetFacialMotors.sendData(ComUtils.XmlUtils.Serialize<List<ServoMotor>>(listMotorsFacialExpression));
-
-                    receivedFacialExpression = null;
-
-                    listMotorsFacialExpression.Clear();
-                   
                 }
-                catch (Exception exc)
-                {
-                    Console.WriteLine("Error XML Set motors: " + exc.Message);
-                }
-
             }
         }
 
@@ -656,33 +665,18 @@ namespace FACERobotController
             if (senderThreadFeedBack != null)
                 senderThreadFeedBack.Abort();
 
+            receiverThreadFeedBack.Abort();
+            receiverThreadLookAt.Abort();
+            receiveThreadECS.Abort();
+            receiveThreadFacialExpression.Abort();
+
             if (TimerCheckStatusYarp != null)
             { 
                 TimerCheckStatusYarp.Elapsed -= new ElapsedEventHandler(CheckStatusYarp);
                 TimerCheckStatusYarp.Stop();
             }
 
-            if (yarpLookAtTimer != null)
-            {
-              
-                //yarpLookAtTimer.Elapsed -= new ElapsedEventHandler(ReceiverDataLookAt);
-                //  yarpLookAtTimer.Stop();
-            }
-            
-            if (yarpReceverECSTimer != null)
-            {
-                
-                //yarpReceverECSTimer.Elapsed -= new ElapsedEventHandler(ReceiveDataECS);
-                //yarpReceverECSTimer.Stop();
-            }
-
-            if (yarpReceverFacialExpressionTimer != null)
-            {
-                yarpReceverFacialExpressionTimer.Elapsed -= new ElapsedEventHandler(ReceiveDataFacialExpression);
-                yarpReceverFacialExpressionTimer.Stop();
-            }
-
-
+          
             if (yarpPortLookAt != null)
                 yarpPortLookAt.Close();
 

@@ -1,4 +1,4 @@
-﻿<Window x:Class="FACERobotControl.YarpMonitor"
+﻿<Window x:Class="FACERobotController.YarpMonitor"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="YarpMonitor"  Height="700" Width="581" Closed="Window_Closed">

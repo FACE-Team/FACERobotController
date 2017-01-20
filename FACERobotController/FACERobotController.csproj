@@ -34,7 +34,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\Debug\</OutputPath>
+    <OutputPath>..\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -43,23 +43,22 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\Release\</OutputPath>
+    <OutputPath>..\bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>FACERobotControl.App</StartupObject>
+    <StartupObject>FACERobotController.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ComUtils">
-      <HintPath>..\..\bin\Debug\ComUtils.dll</HintPath>
+    <Reference Include="ComUtils, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\ComUtils.dll</HintPath>
     </Reference>
-    <Reference Include="FACEBodyControl">
-      <HintPath>..\..\bin\Debug\FACEBodyControl.dll</HintPath>
-    </Reference>
-    <Reference Include="FACELibrary">
-      <HintPath>..\..\bin\Debug\FACELibrary.dll</HintPath>
+    <Reference Include="FACEBodyControl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\FACEBodyControl.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -76,11 +75,13 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="YarpCS">
-      <HintPath>..\..\bin\Debug\YarpCS.dll</HintPath>
+    <Reference Include="YarpCS, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\YarpCS.dll</HintPath>
     </Reference>
-    <Reference Include="YarpManagerCS">
-      <HintPath>..\..\bin\Debug\YarpManagerCS.dll</HintPath>
+    <Reference Include="YarpManagerCS, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\YarpManagerCS.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +159,20 @@
     <Resource Include="Images\logo1.png" />
     <Resource Include="Images\logocp.png" />
     <Resource Include="Images\Unipi_completa.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FACELibrary\FACELibrary.csproj">
+      <Project>{a47084a9-8ede-4c7c-9e48-4b0b5db046ed}</Project>
+      <Name>FACELibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Config.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ECS.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

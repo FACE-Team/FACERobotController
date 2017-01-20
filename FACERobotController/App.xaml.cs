@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Threading;
 
-namespace FACERobotControl
+namespace FACERobotController
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -15,7 +15,7 @@ namespace FACERobotControl
     public partial class App : Application
     {
         // give the mutex a  unique name
-        private const string MutexName = "FACERobotControl";
+        private const string MutexName = "FACERobotController";
         // declare the mutex
         private readonly Mutex _mutex;
         // overload the constructor
